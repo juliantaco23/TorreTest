@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import UserDetails from "./UserDetails";
 import { useAppState } from "./controller/AppStateContext";
 import { AppStateProvider } from "./controller/AppStateContext";
+import "./styles/UserApp.css"; 
 
 
 export const UserApp = () => {
