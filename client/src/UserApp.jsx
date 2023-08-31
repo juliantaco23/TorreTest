@@ -9,7 +9,7 @@ export const UserApp = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { recentSearches, setRecentSearches } = useAppState();
+  const { recentSearches, setRecentSearches, favorites, setFavorites } = useAppState();
 
   useEffect(() => {
     const storedRecentSearches = localStorage.getItem("recentSearches");
@@ -17,11 +17,19 @@ export const UserApp = () => {
       setRecentSearches(JSON.parse(storedRecentSearches));
     }
 
+    const storedFavorites = localStorage.getItem("favorites");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
   }, [recentSearches]);
+
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   const handleSearch = () => {
     if (searchQuery.trim() !== "") {
@@ -41,6 +49,13 @@ export const UserApp = () => {
     }
   };
 
+  const toggleFavorite = (username) => {
+    if (favorites.includes(username)) {
+      setFavorites(favorites.filter((favorite) => favorite !== username));
+    } else {
+      setFavorites([...favorites, username]);
+    }
+  };
 
   return (
     <div className="App">
@@ -60,6 +75,9 @@ export const UserApp = () => {
             {suggestions.map((suggestion) => (
               <li key={suggestion.username}>
                 <Link to={`/user/${suggestion.username}`}>{suggestion.name}</Link>
+                <button onClick={() => toggleFavorite(suggestion.username)}>
+                  {favorites.includes(suggestion.username) ? "Unfavorite" : "Favorite"}
+                </button>
               </li>
             ))}
           </ul>
@@ -70,6 +88,17 @@ export const UserApp = () => {
         <ul>
           {recentSearches.map((search, index) => (
             <li key={index}>{search}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2>Favorites</h2>
+        <ul>
+          {favorites.map((favorite) => (
+            <li key={favorite}>
+              {favorite}
+              <button onClick={() => toggleFavorite(favorite)}>Unfavorite</button>
+            </li>
           ))}
         </ul>
       </div>
