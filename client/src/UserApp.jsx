@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import UserDetails from "./UserDetails";
+import { useAppState } from "./controller/AppStateContext";
+import { AppStateProvider } from "./controller/AppStateContext";
+
 
 export const UserApp = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { recentSearches, setRecentSearches } = useAppState();
+
+  useEffect(() => {
+    const storedRecentSearches = localStorage.getItem("recentSearches");
+    if (storedRecentSearches) {
+      setRecentSearches(JSON.parse(storedRecentSearches));
+    }
+
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("recentSearches", JSON.stringify(recentSearches));
+  }, [recentSearches]);
 
   const handleSearch = () => {
     if (searchQuery.trim() !== "") {
@@ -16,6 +32,7 @@ export const UserApp = () => {
         .then((data) => {
           setSuggestions(data.results);
           setIsLoading(false);
+          setRecentSearches([...recentSearches, searchQuery]);
         })
         .catch((error) => {
           console.log(error);
@@ -23,6 +40,7 @@ export const UserApp = () => {
         });
     }
   };
+
 
   return (
     <div className="App">
@@ -47,17 +65,26 @@ export const UserApp = () => {
           </ul>
         )}
       </div>
+      <div>
+        <h2>Recent Searches</h2>
+        <ul>
+          {recentSearches.map((search, index) => (
+            <li key={index}>{search}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
-
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<UserApp />} />
-        <Route path="/user/:username" element={<UserDetails />} />
-      </Routes>
+      <AppStateProvider>
+        <Routes>
+          <Route path="/" element={<UserApp />} />
+          <Route path="/user/:username" element={<UserDetails />} />
+        </Routes>
+      </AppStateProvider>
     </Router>
   );
 }
