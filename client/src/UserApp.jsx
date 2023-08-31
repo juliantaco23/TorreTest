@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"; // Asegúrate de importar correctamente los módulos de React Router
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+// Componente para mostrar los detalles de la persona
+const UserDetails = ({ match }) => {
+  const { username } = match.params;
+
+  return (
+    <div>
+      <h2>Detalles de {username}</h2>
+      {/* Mostrar detalles de la persona */}
+    </div>
+  );
+};
 
 export const UserApp = () => {
   const [suggestions, setSuggestions] = useState([]);
@@ -10,10 +22,9 @@ export const UserApp = () => {
     if (searchQuery.trim() !== "") {
       setIsLoading(true);
 
-      fetch(`/user/search/${searchQuery}`) // Cambia la URL para usar la ruta del servidor proxy
+      fetch(`/user/search/${searchQuery}`)
         .then((response) => response.json())
         .then((data) => {
-            console.log(data.results);
           setSuggestions(data.results);
           setIsLoading(false);
         })
@@ -22,35 +33,44 @@ export const UserApp = () => {
           setIsLoading(false);
         });
     }
-
-    console.log(suggestions)
   };
 
   return (
     <div className="App">
-            <div>
-                <h1>Search People</h1>
-                <input
-                type="text"
-                placeholder="Search for people"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button onClick={handleSearch}>Search</button>
-                {isLoading ? (
-                <p>Loading...</p>
-                ) : (
-                <ul>
-                    {suggestions.map((suggestion) => (
-                    <li key={suggestion.username}>
-                        {suggestion.name}
-                    </li>
-                    ))}
-                </ul>
-                )}
-            </div>
+      <div>
+        <h1>Search People</h1>
+        <input
+          type="text"
+          placeholder="Search for people"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul>
+            {suggestions.map((suggestion) => (
+              <li key={suggestion.username}>
+                <Link to={`/user/${suggestion.username}`}>{suggestion.name}</Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
 
-export default UserApp;
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<UserApp />} />
+        <Route path="/user/:username" element={<UserDetails />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
