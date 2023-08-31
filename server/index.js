@@ -27,7 +27,7 @@ app.get("/user/search/:query", async (req, res) => {
     }
   });
   
-  app.get("/user/profile/:username", async (req, res) => {
+  app.get("/user/:username", async (req, res) => {
     const { username } = req.params;
   
     try {

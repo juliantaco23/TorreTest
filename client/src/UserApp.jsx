@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
-// Componente para mostrar los detalles de la persona
-const UserDetails = ({ match }) => {
-  const { username } = match.params;
-
-  return (
-    <div>
-      <h2>Detalles de {username}</h2>
-      {/* Mostrar detalles de la persona */}
-    </div>
-  );
-};
+import UserDetails from "./UserDetails";
 
 export const UserApp = () => {
   const [suggestions, setSuggestions] = useState([]);
